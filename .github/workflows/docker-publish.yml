@@ -7,7 +7,7 @@ name: Docker
 
 on:
   schedule:
-    - cron: '26 5 * * *'
+    - cron: '26 3 * * *'
   push:
     branches: [ "main" ]
     # Publish semver tags as releases.
@@ -58,6 +58,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # Extract version information from Dockerfile
+      - name: Extract Version
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "PGSQL_VERSION=$(grep FROM Dockerfile | grep -v pgvector | awk -F ':' '{ print $2 }' | awk -F '-' '{ print $1 }'" >> $GITHUB_OUTPUT
+          echo "PGVECTOR_VERSION=$(grep FROM Dockerfile | grep pgvector | awk -F ':' '{ print $2 }' | awk -F '-' '{ print $1 }'" >> $GITHUB_OUTPUT
+          echo "DOCKERFILE_VERSION=$PGSQL_VERSION+pgvector$PGVECTOR_VERSION" >> $GITHUB_OUTPUT
+        id: version
+
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
       - name: Extract Docker metadata
@@ -66,6 +75,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
+            type=raw,${{ steps.version.outputs.DOCKERFILE_VERSION }}, priority=2000
             type=semver,pattern={{version}}
             type=schedule,pattern={{date 'YYYYMMDD'}}
             type=ref,event=branch
