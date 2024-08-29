@@ -62,9 +62,9 @@ jobs:
       - name: Extract Version
         if: github.ref == 'refs/heads/main'
         run: |
-          PGSQL_VERSION=$(grep FROM Dockerfile | grep -v pgvector | awk -F ':' '{ print $2 }' | awk -F '-' '{ print $1 }')
+          PGSQL_VERSION=$(grep FROM Dockerfile | grep -v pgvector | awk -F ':' '{ print $2 }')
           PGVECTOR_VERSION=$(grep FROM Dockerfile | grep pgvector | awk -F ':' '{ print $2 }' | awk -F '-' '{ print $1 }')
-          echo "DOCKERFILE_VERSION=$PGSQL_VERSION+pgvector$PGVECTOR_VERSION" >> $GITHUB_OUTPUT
+          echo "DOCKERFILE_VERSION=$PGSQL_VERSION+pgvector-$PGVECTOR_VERSION" >> $GITHUB_OUTPUT
         id: version
 
       # Extract metadata (tags, labels) for Docker
