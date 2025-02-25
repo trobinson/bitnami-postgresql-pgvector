@@ -1,4 +1,4 @@
-FROM pgvector/pgvector:0.8.0-pg16 AS builder
+FROM pgvector/pgvector:0.8.0-pg17 AS builder
 
 FROM bitnami/postgresql:17.4.0-debian-12-r2
 
